@@ -1,0 +1,76 @@
+@startuml
+title playing game
+
+package domain <<Frame>> {
+
+    abstract class "エンティティ" as Entity {
+        x: int
+        y: int
+        vx: int
+        vy: int
+
+    }
+
+    abstract class "弾" as Bullet extends Entity{
+        attack: int
+
+        vanish()
+    }
+
+    class "自機弾" as MyBullet extends Bullet {
+        +vanish()
+    }
+
+    class "敵機弾" as EnemyBullet extends Bullet {
+        +vanish()
+    }
+
+    abstract class "機体" as Aircraft extends Entity {
+
+        hit()
+    }
+
+    class "自機" as MyAircraft extends Aircraft {
+        remain: int
+        result: Result
+
+        +hit()
+        +isGameover()
+        +fire()
+    }
+
+    class "結果" as Result {
+        score: int
+        playerName: String
+    }
+
+    MyAircraft *-- Result
+
+    class "敵機" as EnemyAircraft extends Aircraft {
+        hp: int
+        point: int
+
+        +hit()
+        +vanish()
+        +fire()
+    }
+}
+
+package controller <<Frame>> {
+    class "ゲーム管理" as Administrator {
+        myAircraft: MyAircraft
+        enemyAircrafts: List<EnemyAircraft>
+        myBullets: List<MyBullet>
+        enemyBullets: List<EnemyBullet>
+
+        move()
+    }
+}
+
+Administrator *-- MyAircraft
+Administrator *-- EnemyAircraft
+Administrator *-- MyBullet
+Administrator *-- EnemyBullet
+
+
+@enduml

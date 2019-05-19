@@ -1,0 +1,27 @@
+@startuml
+actor player
+participant スコア確認画面
+participant administrator
+participant myAircraft
+participant enemyAircraft
+participant myBullet
+participant enemyBullet
+loop 毎フレーム
+administrator -> enemyAircraft: createEnemy()
+player -> myAircraft: 「十字キー」押下
+
+administrator -> enemyAircraft: move() 
+administrator -> myBullet: move()
+administrator -> enemyBullet: move()
+
+myAircraft -> myBullet: fire()
+enemyAircraft -> enemyBullet: fire()
+
+enemyAircraft -> result: earn(int score)
+
+end
+
+participant result
+
+
+@enduml
