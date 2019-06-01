@@ -17,6 +17,7 @@ package domain <<Frame>> {
         vanish()
     }
 
+
     class "自機弾" as MyBullet extends Bullet {
         +vanish()
     }
@@ -54,6 +55,12 @@ package domain <<Frame>> {
         +vanish()
         +fire()
     }
+    abstract class "弾ファクトリー" as BulletFactory {
+        +create()
+        +{abstract} Bullet createBullet()
+        +{abstract} void registerBullet()
+    }
+    MyAircraft *-- BulletFactory
 }
 
 package controller <<Frame>> {
@@ -65,6 +72,29 @@ package controller <<Frame>> {
 
         move()
     }
+
+
+    BulletFactory --> Bullet : Creates
+
+    Class "自機弾ファクトリー" as MyBulletFactory extends BulletFactory{
+        +MyBullet createBullet()
+        +void registerBullet()
+    }
+
+    MyBulletFactory --> MyBullet : Creates
+
+    Class "敵機弾ファクトリー" as EnemyBulletFactory extends BulletFactory{
+        +EnemyBullet createBullet()
+        +void registerBullet()
+    }
+
+    EnemyBulletFactory --> EnemyBullet : Creates
+
+    Class "自機ビュー" as MyAircraftView {
+
+    }
+    MyAircraftView *-- MyAircraft
+
 }
 
 Administrator *-- MyAircraft
