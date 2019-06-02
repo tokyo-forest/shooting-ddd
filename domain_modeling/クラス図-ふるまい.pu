@@ -186,7 +186,7 @@ package controller <<Frame>> {
         +down()
     }
 
-    Administrator *-- InputMnager
+    Administrator *-- InputManager
 
     Class "自機ビュー" as MyAircraftView {
     }
