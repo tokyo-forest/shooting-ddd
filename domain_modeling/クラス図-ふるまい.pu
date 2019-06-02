@@ -171,12 +171,23 @@ package controller <<Frame>> {
     }
     class "ゲーム管理" as Administrator {
         myAircraft: MyAircraft
+        inputManager: InputManger
         enemyAircrafts: List<EnemyAircraft>
         myBullets: List<MyBullet>
         enemyBullets: List<EnemyBullet>
 
         move()
     }
+
+    interface "インプットマネージャー" as InputManager {
+        +left()
+        +right()
+        +up()
+        +down()
+    }
+
+    Administrator *-- InputMnager
+
     Class "自機ビュー" as MyAircraftView {
     }
 
@@ -194,6 +205,21 @@ package controller <<Frame>> {
     EnemyAircraftView *-- EnemyAircraft
     MyBulletView *-- MyBullet
     EnemyBulletView *-- EnemyBullet
+}
+
+package infra <<Frame>> {
+    Class KeyboardManager implements InputManager {
+        +left()
+        +right()
+        +up()
+        +down()
+    }
+
+    Class Keyboard {
+
+    }
+
+    KeyboardManager *-- Keyboard
 }
 
 Administrator *-- domain
