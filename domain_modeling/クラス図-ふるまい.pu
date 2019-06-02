@@ -4,126 +4,161 @@ title playing game
 package domain <<Frame>> {
 
     package エンティティ <<Frame>> {
-        abstract class "エンティティ" as Entity implements 座標 {
+        abstract class "エンティティ" as Entity implements PositionIF {
+            position: Position
+            velocity: Velocity
+            radius: int
         }
 
-        interface 座標 {
+        interface "座標IF" as PositionIF{
+            +getPosition():Position;
+
+        }
+    }
+
+    package 値オブジェクト <<Frame>> {
+        class "座標" as Position {
             x: int
             y: int
+        }
+
+        class "速度" as Velocity {
             vx: int
             vy: int
         }
+
+        class "壁" as Wall {
+            position1: Position
+            position2: Position
+
+            +isIn(Position): boolean
+        }
     }
 
-   package 機体 <<Frame>> {
-    abstract class "機体" as Aircraft extends Entity {
-        hit()
+    Wall *-- Position
+
+    Entity *-- Position
+    Entity *-- Velocity
+
+    package 機体 <<Frame>> {
+        abstract class "機体" as Aircraft extends Entity {
+            hit()
+        }
+
+        class "自機" as MyAircraft extends Aircraft {
+            remain: int
+            result: Result
+            factory: BulletFactoryInterface
+
+            +hit()
+            +isGameover()
+            +fire()
+        }
+        class "敵機" as EnemyAircraft extends Aircraft {
+            hp: int
+            point: int
+            factory: BulletFactoryInterface
+
+            +hit()
+            +vanish()
+            +fire()
+        }
     }
 
-    class "自機" as MyAircraft extends Aircraft {
-        remain: int
-        result: Result
-
-        +hit()
-        +isGameover()
-        +fire()
+    interface "弾ファクトリーIF" as BulletFactoryInterface {
+        +createBullet()
     }
-    class "敵機" as EnemyAircraft extends Aircraft {
-        hp: int
-        point: int
 
-        +hit()
-        +vanish()
-        +fire()
-    }
-   }
+    MyAircraft *-- BulletFactoryInterface
+    EnemyAircraft *-- BulletFactoryInterface
 
-   package 弾 <<Frame>> {
-     abstract class "弾" as Bullet extends Entity{
-       attack: int
+    package 弾 <<Frame>> {
+        abstract class "弾" as Bullet extends Entity{
+            attack: int
 
             vanish()
         }
 
-    class "自機弾" as MyBullet extends Bullet {
-        +vanish()
+        class "自機弾" as MyBullet extends Bullet {
+            +vanish()
+        }
+
+        class "敵機弾" as EnemyBullet extends Bullet {
+            +vanish()
+        }
+    }
+    class "結果" as Result {
+        score: int
+        playerName: String
     }
 
-    class "敵機弾" as EnemyBullet extends Bullet {
-        +vanish()
+    MyAircraft *-- Result
+
+    package 行動パターン <<Frame>> {
+        interface 行動パターン extends PositionIF{
+            行動ロジック: 行動ロジック
+            +次の行動()
+        }
+
+        abstract class "行動ロジック" as actionLogic {
+            +次の行動()
+        }
+
+        class "直進" as straight extends actionLogic{
+        }
+
+        class "曲がって進む" as turn extends actionLogic{
+        }
+
+        行動パターン --* actionLogic
+        Entity ..|> 行動パターン
     }
-   }
-   class "結果" as Result {
-       score: int
-       playerName: String
-   }
 
-   MyAircraft *-- Result
+    package 衝突判定 <<Frame>> {
+        interface 衝突オブジェクト {
+            +衝突時の振る舞い(): 衝突時の振る舞い
+        }
 
-   package 行動パターン <<Frame>> {
-     interface 行動パターン extends 座標{
-       行動ロジック: 行動ロジック
-       +次の行動()
-     }
+        abstract 衝突判定 {
+            Objリスト: List<衝突オブジェクト>
+            判定する()
+        }
 
-     abstract class "行動ロジック" as actionLogic {
-       +次の行動()
-     }
+        class オブジェクト間判定 extends 衝突判定{
+        }
 
-     class "直進" as straight extends actionLogic{
-     }
+        class 壁判定 extends 衝突判定{
+        }
 
-     class "曲がって進む" as turn extends actionLogic{
-     }
+        衝突判定 --> 衝突オブジェクト
+        Entity ..|> 衝突オブジェクト
 
-     行動パターン --* actionLogic
-     Entity ..|> 行動パターン
-   }
+    }
 
-   package 衝突判定 <<Frame>> {
-     interface 衝突オブジェクト {
-       radius: int
-       +衝突時の振る舞い(): 衝突時の振る舞い
-     }
-
-     abstract 衝突判定 {
-       Objリスト: List<衝突オブジェクト>
-       判定する()
-     }
-
-     class オブジェクト間判定 extends 衝突判定{
-     }
-
-     class 壁判定 extends 衝突判定{
-     }
-
-     衝突判定 --> 衝突オブジェクト
-     Entity ..|> 衝突オブジェクト
-
-   }
+    package ダメージ判定 <<Frame>> {
+    }
 
 }
 
 package factory <<Frame>> {
-    Class "自機弾ファクトリー" as MyBulletFactory extends BulletFactory{
+    Class "自機弾ファクトリー" as MyBulletFactory implements BulletFactoryInterface{
         +MyBullet createBullet()
         +void registerBullet()
     }
-    Class "敵機弾ファクトリー" as EnemyBulletFactory extends BulletFactory{
+    Class "敵機弾ファクトリー" as EnemyBulletFactory implements BulletFactoryInterface{
         +EnemyBullet createBullet()
         +void registerBullet()
     }
 
-    BulletFactory --> Bullet : Creates
     MyBulletFactory --> MyBullet : Creates
-    MyAircraft *-- BulletFactory
+    EnemyBulletFactory --> EnemyBullet : Creates
 }
 
 package controller <<Frame>> {
     abstract class "弾ファクトリー" as BulletFactory {
-            +create()
-            +{abstract} Bullet createBullet()
-            +{abstract} void registerBullet()
+        +create()
+        +{abstract} Bullet createBullet()
+        +{abstract} void registerBullet()
     }
     class "ゲーム管理" as Administrator {
         myAircraft: MyAircraft
@@ -134,14 +169,24 @@ package controller <<Frame>> {
         move()
     }
     Class "自機ビュー" as MyAircraftView {
+    }
 
+    Class "敵機ビュー" as EnemyAircraftView {
+    }
+
+    Class "自機弾ビュー" as MyBulletView {
+    }
+
+    Class "敵機弾ビュー" as EnemyBulletView {
     }
 
     EnemyBulletFactory --> EnemyBullet : Creates
     MyAircraftView *-- MyAircraft
+    EnemyAircraftView *-- EnemyAircraft
+    MyBulletView *-- MyBullet
+    EnemyBulletView *-- EnemyBullet
 }
 
 Administrator *-- domain
-
 
 @enduml
