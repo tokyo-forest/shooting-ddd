@@ -195,8 +195,6 @@ package controller <<Frame>> {
 
     factory --> EntityView : Creates
 
-    EnemyBulletFactory --> EnemyBullet : Creates
-
     Administrator --> PixiAdapter : Use
 }
 
