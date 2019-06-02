@@ -33,6 +33,10 @@ package domain <<Frame>> {
 
             +isIn(Position): boolean
         }
+
+        class "ダメージ値" as Damage {
+          damage: int
+        }
     }
 
     Wall *-- Position
@@ -74,7 +78,7 @@ package domain <<Frame>> {
 
     package 弾 <<Frame>> {
         abstract class "弾" as Bullet extends Entity{
-            attack: int
+            attack: ダメージ値
 
             vanish()
         }
@@ -136,6 +140,11 @@ package domain <<Frame>> {
     }
 
     package ダメージ判定 <<Frame>> {
+     interface ダメージ判定処理 {
+         ダメージを受ける(ダメージ値)void;
+     }
+
+     Entity ..|> ダメージ判定処理
     }
 
 }
