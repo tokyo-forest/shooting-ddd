@@ -164,11 +164,6 @@ package factory <<Frame>> {
 }
 
 package controller <<Frame>> {
-    abstract class "弾ファクトリー" as BulletFactory {
-        +create()
-        +{abstract} Bullet createBullet()
-        +{abstract} void registerBullet()
-    }
     class "ゲーム管理" as Administrator {
         myAircraft: MyAircraft
         inputManager: InputManger
@@ -188,23 +183,13 @@ package controller <<Frame>> {
 
     Administrator *-- InputManager
 
-    Class "自機ビュー" as MyAircraftView {
+    Class "エンティティビュー" as EntityView {
+        sprite: Sprite
     }
 
-    Class "敵機ビュー" as EnemyAircraftView {
-    }
-
-    Class "自機弾ビュー" as MyBulletView {
-    }
-
-    Class "敵機弾ビュー" as EnemyBulletView {
-    }
+    factory --> EntityView : Creates
 
     EnemyBulletFactory --> EnemyBullet : Creates
-    MyAircraftView *-- MyAircraft
-    EnemyAircraftView *-- EnemyAircraft
-    MyBulletView *-- MyBullet
-    EnemyBulletView *-- EnemyBullet
 }
 
 package infra <<Frame>> {
