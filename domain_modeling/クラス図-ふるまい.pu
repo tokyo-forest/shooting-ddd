@@ -35,7 +35,7 @@ package domain <<Frame>> {
         }
 
         class "ダメージ値" as Damage {
-          damage: int
+            damage: int
         }
     }
 
@@ -140,11 +140,11 @@ package domain <<Frame>> {
     }
 
     package ダメージ判定 <<Frame>> {
-     interface ダメージ判定処理 {
-         ダメージを受ける(ダメージ値)void;
-     }
+        interface ダメージ判定処理 {
+            ダメージを受ける(ダメージ値)void;
+        }
 
-     Entity ..|> ダメージ判定処理
+        Entity ..|> ダメージ判定処理
     }
 
 }
@@ -183,13 +183,21 @@ package controller <<Frame>> {
 
     Administrator *-- InputManager
 
-    Class "エンティティビュー" as EntityView {
-        sprite: Sprite
+    package view <<Frame>> {
+        Class "エンティティビュー" as EntityView {
+            sprite: Sprite
+        }
+
+        Class "Pixiアダプター" as PixiAdapter {
+        }
+
     }
 
     factory --> EntityView : Creates
 
     EnemyBulletFactory --> EnemyBullet : Creates
+
+    Administrator --> PixiAdapter : Use
 }
 
 package infra <<Frame>> {
