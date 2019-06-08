@@ -1,4 +1,4 @@
-@startuml 
+@startuml
 title playing game
 
 package domain <<Frame>> {
@@ -27,16 +27,20 @@ package domain <<Frame>> {
             vy: int
         }
 
-        class "壁" as Wall {
-            position1: Position
-            position2: Position
-
-            +isIn(Position): boolean
-        }
 
         class "ダメージ値" as Damage {
             damage: int
         }
+    }
+
+    package 壁 <<Frame>> {
+        class "壁" as Wall {
+            position1: Position
+            position2: Position
+
+            ' +isIn(Position): boolean
+        }
+
     }
 
     Wall *-- Position
@@ -123,28 +127,28 @@ package domain <<Frame>> {
             +衝突時の振る舞い(): 衝突時の振る舞い
         }
 
-        abstract 衝突判定 {
+        abstract "衝突判定" as CollisionJudge {
             Objリスト: List<衝突オブジェクト>
             判定する()
         }
 
-        class オブジェクト間判定 extends 衝突判定{
+        class オブジェクト間判定 extends CollisionJudge{
         }
 
-        class 壁判定 extends 衝突判定{
+        class 壁判定 extends CollisionJudge{
         }
 
-        衝突判定 --> ICollision
-        Aircraft ..|> ICollision
+        CollisionJudge --> ICollision
+        Entity ..|> ICollision
 
     }
 
     package ダメージ判定 <<Frame>> {
-        interface ダメージ判定処理 {
+        interface "ダメージ判定処理" as DamageJudge {
             ダメージを受ける(ダメージ値)void;
         }
 
-        Aircraft ..|> ダメージ判定処理
+        Aircraft ..|> DamageJudge
     }
 
 }
